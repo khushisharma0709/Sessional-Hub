@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate Paper | Sessional Hub</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+<div class="logo">SESSIONAL HUB</div>
+
+<nav>
+<a href="/">Home</a>
+<a href="/generate">Generate</a>
+<a href="/evaluate">Evaluate</a>
+<a href="/dashboard">Dashboard</a>
+</nav>
+</header>
+
+<section class="form-section">
+
+<h1>Generate Question Paper</h1>
+<p class="sub-text">Choose units, topics, difficulty and total marks.</p>
+
+<form action="/generate_paper" method="POST" class="paper-form">
+
+<!-- Subject -->
+<label>Subject</label>
+<select name="subject" required>
+<option value="">Select Subject</option>
+{% for sub in subjects %}
+<option value="{{ sub }}">{{ sub }}</option>
+{% endfor %}
+</select>
+
+<!-- Difficulty -->
+<label>Difficulty Level</label>
+<select name="difficulty" required>
+<option value="">Select Difficulty</option>
+<option>Easy</option>
+<option>Medium</option>
+<option>Hard</option>
+<option>Mixed</option>
+</select>
+
+<!-- Total Marks -->
+<label>Total Marks</label>
+<input type="number" name="total_marks" required>
+
+<!-- UNIT 1 -->
+<div class="unit-box">
+<label>
+<input type="checkbox" name="units" value="1" onclick="showUnit(1)">
+ Unit 1
+</label>
+
+<div id="unit1box" style="display:none;">
+
+<select name="unit1_mode" onchange="toggleTopics(this,'u1topics')">
+<option value="full">Full Unit</option>
+<option value="partial">Partial Unit</option>
+</select>
+
+<div id="u1topics" style="display:none;">
+<label>Select Topics</label>
+<input type="number" min="1" placeholder="How many topics?" oninput="limitTopics(this,1)">
+<label><input type="checkbox" name="unit1_topics" value="Introduction"> Introduction</label>
+<label><input type="checkbox" name="unit1_topics" value="Kernel"> Kernel</label>
+<label><input type="checkbox" name="unit1_topics" value="System Calls"> System Calls</label>
+<label><input type="checkbox" name="unit1_topics" value="OS Services"> OS Services</label>
+</div>
+
+</div>
+</div>
+
+<!-- UNIT 2 -->
+<div class="unit-box">
+<label>
+<input type="checkbox" name="units" value="2" onclick="showUnit(2)">
+ Unit 2
+</label>
+
+<div id="unit2box" style="display:none;">
+
+<select name="unit2_mode" onchange="toggleTopics(this,'u2topics')">
+<option value="full">Full Unit</option>
+<option value="partial">Partial Unit</option>
+</select>
+
+<div id="u2topics" style="display:none;">
+<label>Select Topics</label>
+<input type="number" min="1" placeholder="How many topics?" oninput="limitTopics(this,2)">
+<label><input type="checkbox" name="unit2_topics" value="Scheduling"> Scheduling</label>
+<label><input type="checkbox" name="unit2_topics" value="Threads"> Threads</label>
+<label><input type="checkbox" name="unit2_topics" value="CPU Algorithms"> CPU Algorithms</label>
+<label><input type="checkbox" name="unit2_topics" value="Dispatcher"> Dispatcher</label>
+</div>
+
+</div>
+</div>
+
+<!-- UNIT 3 -->
+<div class="unit-box">
+<label>
+<input type="checkbox" name="units" value="3" onclick="showUnit(3)">
+ Unit 3
+</label>
+
+<div id="unit3box" style="display:none;">
+
+<select name="unit3_mode" onchange="toggleTopics(this,'u3topics')">
+<option value="full">Full Unit</option>
+<option value="partial">Partial Unit</option>
+</select>
+
+<div id="u3topics" style="display:none;">
+<label>Select Topics</label>
+<input type="number" min="1" placeholder="How many topics?" oninput="limitTopics(this,3)">
+<label><input type="checkbox" name="unit3_topics" value="Deadlock"> Deadlock</label>
+<label><input type="checkbox" name="unit3_topics" value="Paging"> Paging</label>
+<label><input type="checkbox" name="unit3_topics" value="Segmentation"> Segmentation</label>
+<label><input type="checkbox" name="unit3_topics" value="Virtual Memory"> Virtual Memory</label>
+</div>
+
+</div>
+</div>
+
+<!-- Unit 4 -->
+<div class="unit-box">
+<label><input type="checkbox" name="units" value="4" onclick="showUnit(4)"> Unit 4</label>
+<div id="unit4box" style="display:none;">
+<select name="unit4_mode" onchange="toggleTopics(this,'u4topics')">
+<option value="full">Full Unit</option>
+<option value="partial">Partial Unit</option>
+</select>
+
+<div id="u4topics" style="display:none;">
+<input type="number" min="1" placeholder="How many topics?" oninput="limitTopics(this,4)">
+<label><input type="checkbox" name="unit4_topics" value="File System"> File System</label>
+<label><input type="checkbox" name="unit4_topics" value="Disk Scheduling"> Disk Scheduling</label>
+<label><input type="checkbox" name="unit4_topics" value="Directory"> Directory</label>
+<label><input type="checkbox" name="unit4_topics" value="Allocation"> Allocation</label>
+</div>
+</div>
+</div>
+
+<!-- Unit 5 -->
+<div class="unit-box">
+<label><input type="checkbox" name="units" value="5" onclick="showUnit(5)"> Unit 5</label>
+<div id="unit5box" style="display:none;">
+<select name="unit5_mode" onchange="toggleTopics(this,'u5topics')">
+<option value="full">Full Unit</option>
+<option value="partial">Partial Unit</option>
+</select>
+
+<div id="u5topics" style="display:none;">
+<input type="number" min="1" placeholder="How many topics?" oninput="limitTopics(this,5)">
+<label><input type="checkbox" name="unit5_topics" value="Protection"> Protection</label>
+<label><input type="checkbox" name="unit5_topics" value="Security"> Security</label>
+<label><input type="checkbox" name="unit5_topics" value="Authentication"> Authentication</label>
+<label><input type="checkbox" name="unit5_topics" value="Access Control"> Access Control</label>
+</div>
+</div>
+</div>
+
+<button type="submit" class="btn-submit">Generate Question Paper</button>
+
+</form>
+</section>
+
+<script>
+function showUnit(num){
+let box=document.getElementById("unit"+num+"box");
+box.style.display = box.style.display==="none" ? "block":"none";
+}
+
+function toggleTopics(selectBox,id){
+let box=document.getElementById(id);
+if(selectBox.value==="partial"){
+box.style.display="block";
+}else{
+box.style.display="none";
+}
+}
+
+function limitTopics(input,unit){
+let max=parseInt(input.value);
+let checks=document.querySelectorAll('input[name="unit'+unit+'_topics"]');
+
+checks.forEach(c=>{
+c.onclick=function(){
+let selected=document.querySelectorAll('input[name="unit'+unit+'_topics"]:checked');
+if(selected.length>max){
+this.checked=false;
+alert("Only "+max+" topics allowed");
+}
+}
+});
+}
+</script>
+
+</body>
+</html>
