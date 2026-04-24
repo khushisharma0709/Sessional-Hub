@@ -1,24 +1,29 @@
+import requests
+from dotenv import load_dotenv
 from flask import Flask, render_template, request
 import pandas as pd
 import os
-import re
 import PyPDF2
 from werkzeug.utils import secure_filename
 
+# -------------------- SETUP --------------------
 app = Flask(__name__)
 
-# Upload & Results Folders
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Folders
 UPLOAD_FOLDER = "uploads"
 RESULTS_FOLDER = "generated_paper_result"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULTS_FOLDER, exist_ok=True)
 
-# Dataset Path
+# Dataset
 DATASET_PATH = "database/os_250_full_real_clean.csv"
-
-# Load Dataset
 df = pd.read_csv(DATASET_PATH)
 
+
+# -------------------- ROUTES --------------------
 
 # Home Page
 @app.route('/')
@@ -27,14 +32,14 @@ def home():
     return render_template("index.html", subjects=subjects)
 
 
-# Generate Paper Page
+# Generate Page
 @app.route('/generate')
 def generate():
     subjects = df['subject_name'].unique()
     return render_template("generate.html", subjects=subjects)
 
 
-# Generate Question Paper
+# Generate Paper
 @app.route('/generate_paper', methods=['POST'])
 def generate_paper():
 
@@ -66,74 +71,78 @@ def evaluate():
     return render_template("evaluate.html")
 
 
-# Evaluate Answer
+# -------------------- AI EVALUATION --------------------
 @app.route('/evaluate_answer', methods=['POST'])
 def evaluate_answer():
 
     student_answer = request.form.get('student_answer', '').strip()
     max_marks = int(request.form.get('max_marks', 10))
 
-    # PDF upload support
+    # -------- PDF Upload --------
     uploaded_text = ''
     file = request.files.get('answer_pdf')
+
     if file and file.filename.endswith('.pdf'):
         fname = secure_filename(file.filename)
         fpath = os.path.join(UPLOAD_FOLDER, fname)
         file.save(fpath)
+
         with open(fpath, 'rb') as f:
             reader = PyPDF2.PdfReader(f)
             uploaded_text = ' '.join(
                 page.extract_text() or '' for page in reader.pages
             )
 
+    # Final text
     text_to_eval = uploaded_text or student_answer
 
     if not text_to_eval:
-        return render_template("evaluate.html",
-                               error="Please type an answer or upload a PDF.")
+        return render_template(
+            "evaluate.html",
+            error="Please type an answer or upload a PDF."
+        )
 
-    # Keyword similarity scoring
-    def tokenize(t):
-        return set(re.sub(r'[^a-z0-9 ]', '', t.lower()).split())
+    # -------- Gemini AI --------
+    prompt = f"""
+Evaluate this student's answer.
 
-    student_words = tokenize(text_to_eval)
-    reference = request.form.get('reference_answer', '').strip()
+Give:
+- Score out of {max_marks}
+- Strengths
+- Weaknesses
+- Final feedback
 
-    if reference:
-        ref_words = tokenize(reference)
-        overlap = len(student_words & ref_words)
-        similarity = min(100, int((overlap / max(len(ref_words), 1)) * 100 * 2))
-    else:
-        word_count = len(text_to_eval.split())
-        similarity = min(100, word_count * 2)
+Answer:
+{text_to_eval}
+"""
 
-    marks = round((similarity / 100) * max_marks, 1)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
-    if similarity >= 75:
-        feedback = "Excellent! The answer covers most key points thoroughly."
-        grade = "A"
-    elif similarity >= 55:
-        feedback = "Good answer. Some key concepts are present but could be expanded."
-        grade = "B"
-    elif similarity >= 35:
-        feedback = "Average. Several important points are missing. Review the topic."
-        grade = "C"
-    else:
-        feedback = "Needs improvement. The answer lacks key concepts. Please revise."
-        grade = "D"
+    try:
+        response = requests.post(url, json={
+            "contents": [
+                {
+                    "parts": [{"text": prompt}]
+                }
+            ]
+        })
 
+        data = response.json()
+
+        ai_output = data["candidates"][0]["content"]["parts"][0]["text"]
+
+    except Exception as e:
+        ai_output = f"Error: {str(e)}"
+
+    # Result send to frontend
     result = {
-        'marks': marks,
-        'max_marks': max_marks,
-        'similarity': similarity,
-        'feedback': feedback,
-        'grade': grade
+        "ai_result": ai_output
     }
 
     return render_template("evaluate.html", result=result)
 
 
-# Dashboard Page
+# -------------------- DASHBOARD --------------------
 @app.route('/dashboard')
 def dashboard():
 
@@ -159,5 +168,6 @@ def dashboard():
     )
 
 
+# -------------------- RUN --------------------
 if __name__ == '__main__':
     app.run(debug=True)
