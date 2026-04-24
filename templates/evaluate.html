@@ -32,9 +32,24 @@
     <!-- Form -->
     <form action="/evaluate_answer" method="POST" enctype="multipart/form-data" class="paper-form">
 
+        <!-- Typed Answer -->
+        <label>Type Student Answer</label>
+        <textarea name="student_answer" rows="6" placeholder="Type or paste student answer here..."></textarea>
+
+        <!-- Reference Answer -->
+        <label>Reference Answer (optional — improves accuracy)</label>
+        <textarea name="reference_answer" rows="4" placeholder="Paste expected answer or key points..."></textarea>
+
+        <!-- Max Marks -->
+        <label>Maximum Marks</label>
+        <input type="number" name="max_marks" value="10" min="1" max="100">
+
+        <!-- OR separator -->
+        <label style="text-align:center;color:#888;margin-top:10px;">─── OR Upload PDF ───</label>
+
         <!-- File Upload -->
         <label>Upload Answer PDF</label>
-        <input type="file" name="answer_pdf" accept=".pdf" required>
+        <input type="file" name="answer_pdf" accept=".pdf">
 
         <!-- Button -->
         <button type="submit" class="btn-submit">Evaluate Now</button>
