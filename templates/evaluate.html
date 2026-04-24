@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluate Answers | Sessional Hub</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">SESSIONAL HUB</div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/generate">Generate</a>
+        <a href="/evaluate">Evaluate</a>
+        <a href="/dashboard">Dashboard</a>
+    </nav>
+</header>
+
+<!-- Main Section -->
+<section class="form-section">
+
+    <h1>Evaluate Answers</h1>
+    <p class="sub-text">
+        Upload student answer PDF and get automatic evaluation result.
+    </p>
+
+    <!-- Form -->
+    <form action="/evaluate_answer" method="POST" enctype="multipart/form-data" class="paper-form">
+
+        <!-- File Upload -->
+        <label>Upload Answer PDF</label>
+        <input type="file" name="answer_pdf" accept=".pdf" required>
+
+        <!-- Button -->
+        <button type="submit" class="btn-submit">Evaluate Now</button>
+
+    </form>
+
+</section>
+
+<!-- Result Section -->
+{% if result %}
+
+<section class="result-box">
+
+    <h2>Evaluation Result</h2>
+
+    <p><strong>Marks:</strong> {{ result.marks }}</p>
+
+    <p><strong>Similarity Score:</strong> {{ result.similarity }}%</p>
+
+    <p><strong>Feedback:</strong> {{ result.feedback }}</p>
+
+</section>
+
+{% endif %}
+
+</body>
+</html>

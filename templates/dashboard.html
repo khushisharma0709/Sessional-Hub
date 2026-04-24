@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Sessional Hub</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">SESSIONAL HUB</div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/generate">Generate</a>
+        <a href="/evaluate">Evaluate</a>
+        <a href="/dashboard">Dashboard</a>
+    </nav>
+</header>
+
+<!-- Dashboard Section -->
+<section class="dashboard-section">
+
+    <h1>📊 Dashboard</h1>
+    <p class="sub-text">Overview of your question bank and activity</p>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon">❓</div>
+            <h3>{{ total_questions }}</h3>
+            <p>Total Questions</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <h3>{{ total_subjects }}</h3>
+            <p>Subjects</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📂</div>
+            <h3>{{ total_units }}</h3>
+            <p>Units Available</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📄</div>
+            <h3>{{ papers_generated }}</h3>
+            <p>Papers Generated</p>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="dash-grid">
+
+        <!-- Difficulty Distribution -->
+        <div class="dash-card">
+            <div class="dash-section-title">🎯 Questions by Difficulty</div>
+            <div class="bar-chart" id="diffChart"></div>
+        </div>
+
+        <!-- Unit Distribution -->
+        <div class="dash-card">
+            <div class="dash-section-title">📂 Questions by Unit</div>
+            <div class="bar-chart" id="unitChart"></div>
+        </div>
+
+    </div>
+
+    <!-- Quick Links -->
+    <div class="dash-card" style="text-align:center;padding:36px;">
+        <div class="dash-section-title" style="border:none;margin-bottom:24px;">🚀 Quick Actions</div>
+        <a href="/generate" class="btn" style="margin:8px;display:inline-block;">📄 Generate Paper</a>
+        <a href="/evaluate" class="btn btn-light" style="margin:8px;display:inline-block;background:#2563eb;color:white;">📝 Evaluate Answer</a>
+    </div>
+
+</section>
+
+<footer>
+    <p>© 2026 Sessional Hub | AI Powered Academic Platform</p>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+const diffCounts = {{ diff_counts | tojson }};
+const unitCounts = {{ unit_counts | tojson }};
+
+function renderBars(containerId, data, useColorClass) {
+    const container = document.getElementById(containerId);
+    const max = Math.max(...Object.values(data), 1);
+    container.innerHTML = '';
+    Object.entries(data).forEach(([label, count]) => {
+        const pct = Math.round((count / max) * 100);
+        const colorClass = useColorClass ? label.toLowerCase() : '';
+        container.innerHTML += `
+            <div class="bar-row">
+                <span class="bar-label">${label}</span>
+                <div class="bar-track">
+                    <div class="bar-fill ${colorClass}" style="width:0" data-pct="${pct}"></div>
+                </div>
+                <span class="bar-count">${count}</span>
+            </div>`;
+    });
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            container.querySelectorAll('.bar-fill').forEach(el => {
+                el.style.width = el.dataset.pct + '%';
+            });
+        });
+    });
+}
+
+renderBars('diffChart', diffCounts, true);
+renderBars('unitChart', unitCounts, false);
+</script>
+
+</body>
+</html>

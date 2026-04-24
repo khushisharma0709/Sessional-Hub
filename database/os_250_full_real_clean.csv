@@ -1,4 +1,4 @@
-
+question_id,subject_name,unit_number,topic_name,question_text,difficulty_level,requires_diagram,marks
 1,Operating System,1,Operating System,What is operating system?,Easy,Yes,1
 2,Operating System,1,Kernel,Explain kernel with example.,Medium,No,3
 3,Operating System,1,System Calls,What is system calls?,Easy,No,1
@@ -24,7 +24,7 @@
 23,Operating System,1,System Calls,What is system calls?,Easy,No,1
 24,Operating System,1,OS Structure,Explain os structure with example.,Medium,No,3
 25,Operating System,1,Types of OS,What is types of os?,Easy,No,1
-26,Operating System,1,Operating System,Explain operating system with example.,Mediumquestion_id,subject_name,unit_number,topic_name,question_text,difficulty_level,requires_diagram,marks,No,3
+26,Operating System,1,Operating System,Explain operating system with example.,Medium,No,3
 27,Operating System,1,Kernel,What is kernel?,Easy,No,1
 28,Operating System,1,System Calls,Explain system calls with example.,Medium,No,3
 29,Operating System,1,OS Structure,What is os structure?,Easy,No,1
